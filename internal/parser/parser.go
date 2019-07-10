@@ -1,15 +1,15 @@
-package main
+package parser
 
 import (
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/illfalcon/parser/db"
-	"github.com/illfalcon/parser/finder"
+	"github.com/illfalcon/parser/internal/db"
+	"github.com/illfalcon/parser/internal/finder"
 )
 
-func main() {
+func Parse() {
 	//db.Prepare()
 	service := db.CreateSqliteService()
 	client := &http.Client{
@@ -32,6 +32,10 @@ func main() {
 			log.Printf("error when getting url %s, status: %s\n", url, resp.Status)
 		}
 		err = finder.WriteDivsWithDate(resp, &service)
+		if err != nil {
+			log.Print(err)
+		}
+		err = service.SetURLParsed(url)
 		if err != nil {
 			log.Print(err)
 		}

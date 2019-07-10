@@ -22,11 +22,11 @@ func Send(text string) (*assistantv2.MessageResponse, error) {
 		Password: apiPassword,
 	})
 	if serviceErr != nil {
-		return "", fmt.Errorf("error creating service: %v", serviceErr)
+		return nil, fmt.Errorf("error creating service: %v", serviceErr)
 	}
 	createSessionResponse, createSessionResponseErr := service.CreateSession(service.NewCreateSessionOptions(assistantID))
 	if createSessionResponseErr != nil {
-		return "", fmt.Errorf("error creating service: %v", createSessionResponseErr)
+		return nil, fmt.Errorf("error creating service: %v", createSessionResponseErr)
 	}
 	createSessionResult := service.GetCreateSessionResult(createSessionResponse)
 	sessionID := *createSessionResult.SessionID
@@ -43,7 +43,7 @@ func Send(text string) (*assistantv2.MessageResponse, error) {
 		},
 	)
 	if messageResponseErr != nil {
-		return "", fmt.Errorf("error fetching response: %v", messageResponseErr)
+		return nil, fmt.Errorf("error fetching response: %v", messageResponseErr)
 	}
 	messageResult := service.GetMessageResult(messageResponse)
 	return messageResult, nil

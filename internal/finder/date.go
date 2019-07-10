@@ -1,7 +1,6 @@
 package finder
 
 import (
-	"crypto/sha1"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -9,9 +8,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/illfalcon/parser/db"
-
-	"github.com/illfalcon/parser/watson"
+	"github.com/illfalcon/parser/internal/db"
+	"github.com/illfalcon/parser/internal/watson"
+	"github.com/illfalcon/parser/pkg/str"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -43,24 +42,6 @@ var invitations = []string{
 	"приглашаются", "Приглашаются", "проведет", "проведёт", "Проведет", "Проведёт",
 }
 
-func chunkString(s string, chunkSize int) []string {
-	var chunks []string
-	runes := []rune(s)
-
-	if len(runes) == 0 {
-		return []string{s}
-	}
-
-	for i := 0; i < len(runes); i += chunkSize {
-		nn := i + chunkSize
-		if nn > len(runes) {
-			nn = len(runes)
-		}
-		chunks = append(chunks, string(runes[i:nn]))
-	}
-	return chunks
-}
-
 func containsMonth(text string) bool {
 	for _, month := range months {
 		if strings.Contains(text, month) {
@@ -68,13 +49,6 @@ func containsMonth(text string) bool {
 		}
 	}
 	return false
-}
-
-func findSha1Hash(s string) string {
-	h := sha1.New()
-	h.Write([]byte(s))
-	bs := h.Sum(nil)
-	return string(bs)
 }
 
 func containsInvitation(text string) bool {
@@ -139,11 +113,19 @@ func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
 			if err != nil {
 				return err
 			} else {
-				h := findSha1Hash(s)
-				intent := resp.Output.Intents[0].Intent
-				confidence := resp.Output.Intents[0].Confidence
+				h := str.FindSha1Hash(s)
+				var intent string
+				var confidence float64
+				if resp.Output.Intents != nil && len(resp.Output.Intents) != 0 {
+					intent = *resp.Output.Intents[0].Intent
+					confidence = *resp.Output.Intents[0].Confidence
+				} else {
+					intent = "irrelevant"
+					confidence = 0
+				}
+
 				if contains, _ := dbWriter.ContainsHash(h); !contains {
-					err = dbWriter.AddText(s, h, response.Request.URL.String(), *intent, *confidence)
+					err = dbWriter.AddText(s, h, response.Request.URL.String(), intent, confidence)
 					if err != nil {
 						return err
 					}
@@ -156,7 +138,7 @@ func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
 		text = strings.ReplaceAll(text, "\t", " ")
 		text = strings.ReplaceAll(text, "\r", " ")
 		if len(text) > 2048 {
-			chch := chunkString(text, 2048)
+			chch := str.ChunkString(text, 2048)
 			for _, ch := range chch {
 				err = f(ch)
 				if err != nil {

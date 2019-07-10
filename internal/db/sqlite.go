@@ -7,11 +7,21 @@ import (
 
 type Service interface {
 	TextWriter
+	URLWriter
 }
 
 type TextWriter interface {
 	AddText(text, hash, url, intent string, prob float64) error
 	ContainsHash(hash string) (bool, error)
+}
+
+type URLWriter interface {
+	AddURL(url, hash string) error
+	ContainsURL(url string) (bool, error)
+	GetURLHash(url string) (string, error)
+	SetURLHash(url, hash string) error
+	SetURLParsed(url string) error
+	SetURLUnparsed(url string) error
 }
 
 type service struct {
@@ -38,6 +48,28 @@ func (s *service) AddLanding(url, hash, name string) error {
 	return nil
 }
 
+func (s service) GetAllLandings() ([]string, error) {
+	stmt, err := s.db.Prepare(`select url from landings`)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var urls []string
+	for rows.Next() {
+		var url string
+		err := rows.Scan(&url)
+		if err != nil {
+			return nil, err
+		}
+		urls = append(urls, url)
+	}
+	return urls, nil
+}
+
 func (s *service) AddURL(url, hash string) error {
 	stmt, err := s.db.Prepare(`INSERT into webpages (url, hash, parsed) VALUES (?, ?, ?)`)
 	if err != nil {
@@ -48,6 +80,20 @@ func (s *service) AddURL(url, hash string) error {
 		return err
 	}
 	return nil
+}
+
+func (s *service) ContainsURL(url string) (bool, error) {
+	stmt, err := s.db.Prepare(`select count(*) from webpages where url = ?`)
+	if err != nil {
+		return false, err
+	}
+	var c int
+	row := stmt.QueryRow(url)
+	err = row.Scan(&c)
+	if err != nil {
+		return false, err
+	}
+	return c != 0, nil
 }
 
 func (s service) GetURLHash(url string) (string, error) {

@@ -19,8 +19,8 @@ func Prepare() {
 	db := dbConn()
 	stmt, err := db.Prepare(`CREATE TABLE IF NOT EXISTS landings (
       url TEXT NOT NULL,
-      hash TEXT NOT NULL,
-      name TEXT NOT NULL
+      hash TEXT,
+      name TEXT
     )`)
 	if err != nil {
 		log.Fatal(err)
@@ -45,7 +45,7 @@ func Prepare() {
       url TEXT NOT NULL,
       hash TEXT NOT NULL,
       article TEXT NOT NULL,
-      intro TEXT NOT NULL,
+      intro TEXT,
       approved INTEGER,
       intent TEXT,
       probability REAL
