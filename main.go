@@ -1,26 +1,48 @@
 package main
 
-import "github.com/illfalcon/parser/finder"
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/illfalcon/parser/finder"
+)
 
 func main() {
-	// Make HTTP GET request
-	//client := &http.Client{
-	//	Timeout: 30 * time.Second,
-	//}
-	//
-	//// Make request
-	//response, err := client.Get("https://www.devdungeon.com/")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer response.Body.Close()
-	//
-	//// Copy data from the response to standard output
-	//n, err := io.Copy(os.Stdout, response.Body)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//log.Println("Number of bytes copied to STDOUT:", n)
-	_, _ = finder.ContainsDate()
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+	fileName := "/home/elgreco/Desktop/digital transformation/чувство локтя/sites2.txt"
+	file, err := os.Open(fileName)
+	if err != nil {
+		log.Fatalf("error when opening file %s\n", fileName)
+	}
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	var num int
+	for scanner.Scan() {
+		url := scanner.Text()
+		// Make request
+		resp, err := client.Get(url)
+		if err != nil {
+			log.Printf("error when getting url %s\n", url)
+		}
+		if resp.StatusCode != http.StatusOK {
+			resp.Body.Close()
+			log.Printf("error when getting url %s, status: %s\n", url, resp.Status)
+		}
+
+		defer resp.Body.Close()
+
+		_, err = finder.WriteDivsWithDate(resp, num)
+		if err != nil {
+			log.Print(err)
+		}
+		fmt.Println(num)
+		num++
+	}
+
 }
