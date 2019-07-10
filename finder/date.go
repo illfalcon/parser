@@ -1,14 +1,15 @@
 package finder
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
-	"strconv"
 	"strings"
+
+	"github.com/illfalcon/parser/db"
 
 	"github.com/illfalcon/parser/watson"
 
@@ -42,6 +43,24 @@ var invitations = []string{
 	"приглашаются", "Приглашаются", "проведет", "проведёт", "Проведет", "Проведёт",
 }
 
+func chunkString(s string, chunkSize int) []string {
+	var chunks []string
+	runes := []rune(s)
+
+	if len(runes) == 0 {
+		return []string{s}
+	}
+
+	for i := 0; i < len(runes); i += chunkSize {
+		nn := i + chunkSize
+		if nn > len(runes) {
+			nn = len(runes)
+		}
+		chunks = append(chunks, string(runes[i:nn]))
+	}
+	return chunks
+}
+
 func containsMonth(text string) bool {
 	for _, month := range months {
 		if strings.Contains(text, month) {
@@ -49,6 +68,13 @@ func containsMonth(text string) bool {
 		}
 	}
 	return false
+}
+
+func findSha1Hash(s string) string {
+	h := sha1.New()
+	h.Write([]byte(s))
+	bs := h.Sum(nil)
+	return string(bs)
 }
 
 func containsInvitation(text string) bool {
@@ -64,12 +90,7 @@ func isInlineTag(tag string) bool {
 	return tag == "em" || tag == "strong" || tag == "span"
 }
 
-func WriteDivsWithDate(resp *http.Response, num int) (bool, error) {
-	htmlBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return false, fmt.Errorf("unable to read file")
-	}
-	htmlText := string(htmlBytes)
+func prepareDoc(htmlText string) string {
 	htmlText = strings.ReplaceAll(htmlText, "<em>", "")
 	htmlText = strings.ReplaceAll(htmlText, "<strong>", "")
 	htmlText = strings.ReplaceAll(htmlText, "<span>", "")
@@ -78,6 +99,16 @@ func WriteDivsWithDate(resp *http.Response, num int) (bool, error) {
 	htmlText = strings.ReplaceAll(htmlText, "</span>", "")
 	reg := regexp.MustCompile(`<!--[^>]*-->`)
 	htmlText = reg.ReplaceAllString(htmlText, "")
+	return htmlText
+}
+
+func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
+	htmlBytes, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return fmt.Errorf("unable to read body")
+	}
+	htmlText := string(htmlBytes)
+	htmlText = prepareDoc(htmlText)
 	r := strings.NewReader(htmlText)
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
@@ -100,39 +131,53 @@ func WriteDivsWithDate(resp *http.Response, num int) (bool, error) {
 	}
 	sel := doc.Find("*").FilterFunction(g)
 	if sel.Length() == 0 {
-		return false, fmt.Errorf("empty selection")
+		return fmt.Errorf("empty selection")
 	}
-	file, err := os.Create("/home/elgreco/Desktop/afolder/newfolder/" + strconv.Itoa(num) + ".txt")
-	if err != nil {
-		return false, fmt.Errorf("unable to create file %s: %s", resp.Request.URL.Path+".txt", err)
-	}
-	defer file.Close()
 	sel.Each(func(i int, selection *goquery.Selection) {
-		//_, err = file.WriteString(strings.TrimSpace(selection.Closest("div").Contents().Text()) +
-		//	"\n_______________________\n")
-		//if err != nil {
-		//	log.Printf("unable to write to file %s: %s", resp.Request.URL.Path+".txt", err)
-		//}
+		f := func(s string) error {
+			resp, err := watson.Send(s)
+			if err != nil {
+				return err
+			} else {
+				h := findSha1Hash(s)
+				intent := resp.Output.Intents[0].Intent
+				confidence := resp.Output.Intents[0].Confidence
+				if contains, _ := dbWriter.ContainsHash(h); !contains {
+					err = dbWriter.AddText(s, h, response.Request.URL.String(), *intent, *confidence)
+					if err != nil {
+						return err
+					}
+				}
+			}
+			return nil
+		}
 		text := strings.TrimSpace(selection.Closest("div").Contents().Text())
 		text = strings.ReplaceAll(text, "\n", " ")
 		text = strings.ReplaceAll(text, "\t", " ")
 		text = strings.ReplaceAll(text, "\r", " ")
-		resp, err := watson.SendToWatson(text)
-		//if err != nil {
-		//	return false, fmt.Errorf("error when interacting with watson: %v", err)
-		//}
-		if err != nil {
-			log.Println(err)
-		} else {
-			_, err = file.WriteString(text)
-			if err != nil {
-				log.Printf("unable to write to file %s: %s", file.Name(), err)
+		if len(text) > 2048 {
+			chch := chunkString(text, 2048)
+			for _, ch := range chch {
+				err = f(ch)
+				if err != nil {
+					log.Println(err)
+				}
 			}
-			_, err = file.WriteString("\n" + resp)
+		} else {
+			err = f(text)
 			if err != nil {
-				log.Printf("unable to write to file %s: %s", file.Name(), err)
+				log.Println(err)
 			}
 		}
 	})
-	return true, nil
+	return nil
 }
+
+//func unmarshalWatson(resp string) (map[string]interface{}, error) {
+//	var m map[string]interface{}
+//	err := json.Unmarshal([]byte(resp), &m)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return m, nil
+//}

@@ -1,30 +1,26 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/illfalcon/parser/db"
 	"github.com/illfalcon/parser/finder"
 )
 
 func main() {
+	//db.Prepare()
+	service := db.CreateSqliteService()
 	client := &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	fileName := "/home/elgreco/Desktop/afolder/newfile.txt"
-	file, err := os.Open(fileName)
+	urls, err := service.GetUnparsedURLs()
 	if err != nil {
-		log.Fatalf("error when opening file %s\n", fileName)
+		log.Fatal(err)
 	}
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	var num int
-	for scanner.Scan() {
-		url := scanner.Text()
+	for _, url := range urls {
+		//url := scanner.Text()
 		// Make request
 		resp, err := client.Get(url)
 		if err != nil {
@@ -35,12 +31,10 @@ func main() {
 			resp.Body.Close()
 			log.Printf("error when getting url %s, status: %s\n", url, resp.Status)
 		}
-		_, err = finder.WriteDivsWithDate(resp, num)
+		err = finder.WriteDivsWithDate(resp, &service)
 		if err != nil {
 			log.Print(err)
 		}
-		fmt.Println(num)
-		num++
 		resp.Body.Close()
 	}
 

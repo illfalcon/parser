@@ -1,14 +1,13 @@
 package watson
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/IBM/go-sdk-core/core"
 	"github.com/watson-developer-cloud/go-sdk/assistantv2"
 )
 
-func SendToWatson(text string) (string, error) {
+func Send(text string) (*assistantv2.MessageResponse, error) {
 	apiVersion := "2018-09-20"
 	apiURL := "https://gateway-lon.watsonplatform.net/assistant/api"
 	apiUsername := "apikey"
@@ -47,6 +46,5 @@ func SendToWatson(text string) (string, error) {
 		return "", fmt.Errorf("error fetching response: %v", messageResponseErr)
 	}
 	messageResult := service.GetMessageResult(messageResponse)
-	b, _ := json.MarshalIndent(messageResult, "", " ")
-	return string(b), nil
+	return messageResult, nil
 }
