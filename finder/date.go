@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/illfalcon/parser/watson"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -34,9 +36,24 @@ var months = []string{
 	" ноябрь", " ноября", " декабрь", " декабря",
 }
 
+var invitations = []string{
+	"Приглашаем", "приглашаем", "Состоится", "состоится", "пройдет", "Пройдет", "пройдёт", "Пройдёт", "открывается",
+	"Открывается", "откроется", "откроется", "проводим", "Проводим", "Проведем", "проведем", "Проведём", "проведём",
+	"приглашаются", "Приглашаются", "проведет", "проведёт", "Проведет", "Проведёт",
+}
+
 func containsMonth(text string) bool {
 	for _, month := range months {
 		if strings.Contains(text, month) {
+			return true
+		}
+	}
+	return false
+}
+
+func containsInvitation(text string) bool {
+	for _, inv := range invitations {
+		if strings.Contains(text, inv) {
 			return true
 		}
 	}
@@ -67,22 +84,8 @@ func WriteDivsWithDate(resp *http.Response, num int) (bool, error) {
 		log.Fatal(err)
 	}
 	doc.Find("script").Remove()
-
-	//root := doc.Get(0)
-	//var nodesWithData []*html.Node
-	//var f func(*html.Node)
-	//f = func(n *html.Node) {
-	//	if n.Type == html.TextNode && containsMonth(n.Data) {
-	//		nodesWithData = append(nodesWithData, n)
-	//		log.Println(n.Data)
-	//	}
-	//	for c := n.FirstChild; c != nil; c = c.NextSibling {
-	//		f(c)
-	//	}
-	//}
-	//f(root)
 	f := func(i int, selection *goquery.Selection) bool {
-		return containsMonth(selection.Text())
+		return containsInvitation(selection.Text())
 	}
 	g := func(i int, selection *goquery.Selection) bool {
 		var b bool
@@ -96,41 +99,40 @@ func WriteDivsWithDate(resp *http.Response, num int) (bool, error) {
 		return b
 	}
 	sel := doc.Find("*").FilterFunction(g)
-	//	NotFunction(func(i int, selection *goquery.Selection) bool {
-	//	return f(i, selection.Children())
-	//})
-	//for _, n := range newSel.Nodes {
-	//	if n.Type == html.TextNode && containsMonth(n.Data) {
-	//		nodesWithData = append(nodesWithData, n)
-	//		log.Println(n.Data)
-	//	}
-	//}
-	//sel := doc.Selection.FindNodes(nodesWithData...)
-	file, err := os.Create("/home/elgreco/Desktop/contents1/" + strconv.Itoa(num) + ".txt")
+	if sel.Length() == 0 {
+		return false, fmt.Errorf("empty selection")
+	}
+	file, err := os.Create("/home/elgreco/Desktop/afolder/newfolder/" + strconv.Itoa(num) + ".txt")
 	if err != nil {
 		return false, fmt.Errorf("unable to create file %s: %s", resp.Request.URL.Path+".txt", err)
 	}
 	defer file.Close()
-	//html.Render(file, doc.Get(0))
 	sel.Each(func(i int, selection *goquery.Selection) {
-		_, err = file.WriteString(strings.TrimSpace(selection.Closest("div").Contents().Text()) +
-			"\n_______________________\n")
+		//_, err = file.WriteString(strings.TrimSpace(selection.Closest("div").Contents().Text()) +
+		//	"\n_______________________\n")
+		//if err != nil {
+		//	log.Printf("unable to write to file %s: %s", resp.Request.URL.Path+".txt", err)
+		//}
+		text := strings.TrimSpace(selection.Closest("div").Contents().Text())
+		text = strings.ReplaceAll(text, "\n", " ")
+		text = strings.ReplaceAll(text, "\t", " ")
+		text = strings.ReplaceAll(text, "\r", " ")
+		resp, err := watson.SendToWatson(text)
+		//if err != nil {
+		//	return false, fmt.Errorf("error when interacting with watson: %v", err)
+		//}
 		if err != nil {
-			log.Printf("unable to write to file %s: %s", resp.Request.URL.Path+".txt", err)
+			log.Println(err)
+		} else {
+			_, err = file.WriteString(text)
+			if err != nil {
+				log.Printf("unable to write to file %s: %s", file.Name(), err)
+			}
+			_, err = file.WriteString("\n" + resp)
+			if err != nil {
+				log.Printf("unable to write to file %s: %s", file.Name(), err)
+			}
 		}
 	})
-	//if newSel.Length() != 0 {
-	//	file, err := os.Create("/home/elgreco/Desktop/contents/" + strconv.Itoa(num) + ".txt")
-	//	if err != nil {
-	//		return false, fmt.Errorf("unable to create file %s: %s", resp.Request.URL.Path+".txt", err)
-	//	}
-	//	defer file.Close()
-	//	newSel.Each(func(i int, selection *goquery.Selection) {
-	//		_, err = file.WriteString(strings.TrimSpace(selection.Text()))
-	//		if err != nil {
-	//			log.Printf("unable to write to file %s: %s", resp.Request.URL.Path+".txt", err)
-	//		}
-	//	})
-	//}
 	return true, nil
 }

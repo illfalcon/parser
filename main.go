@@ -15,7 +15,7 @@ func main() {
 	client := &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	fileName := "/home/elgreco/Desktop/digital transformation/чувство локтя/sites2.txt"
+	fileName := "/home/elgreco/Desktop/afolder/newfile.txt"
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatalf("error when opening file %s\n", fileName)
@@ -29,20 +29,19 @@ func main() {
 		resp, err := client.Get(url)
 		if err != nil {
 			log.Printf("error when getting url %s\n", url)
+			continue
 		}
 		if resp.StatusCode != http.StatusOK {
 			resp.Body.Close()
 			log.Printf("error when getting url %s, status: %s\n", url, resp.Status)
 		}
-
-		defer resp.Body.Close()
-
 		_, err = finder.WriteDivsWithDate(resp, num)
 		if err != nil {
 			log.Print(err)
 		}
 		fmt.Println(num)
 		num++
+		resp.Body.Close()
 	}
 
 }
