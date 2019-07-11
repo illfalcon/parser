@@ -114,17 +114,16 @@ func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
 				return err
 			} else {
 				h := str.FindSha1Hash(s)
-				var intent string
-				var confidence float64
-				if resp.Output.Intents != nil && len(resp.Output.Intents) != 0 {
-					intent = *resp.Output.Intents[0].Intent
-					confidence = *resp.Output.Intents[0].Confidence
-				} else {
-					intent = "irrelevant"
-					confidence = 0
-				}
-
 				if contains, _ := dbWriter.ContainsHash(h); !contains {
+					var intent string
+					var confidence float64
+					if resp.Output.Intents != nil && len(resp.Output.Intents) != 0 {
+						intent = *resp.Output.Intents[0].Intent
+						confidence = *resp.Output.Intents[0].Confidence
+					} else {
+						intent = "irrelevant"
+						confidence = 0
+					}
 					err = dbWriter.AddText(s, h, response.Request.URL.String(), intent, confidence)
 					if err != nil {
 						return err

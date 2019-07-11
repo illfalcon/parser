@@ -48,25 +48,24 @@ func crawl(src, host string, service db.URLWriter) []string {
 			return nil
 		}
 		return list
-	} else {
-		oldHash, err := service.GetURLHash(src)
-		if err != nil {
-			log.Println(err)
-			return nil
-		}
-		if oldHash != h {
-			tokens <- struct{}{}
-			list, err := exrtactNonDocsWithinOrigin(src, host)
-			<-tokens // release the token
-			if err != nil {
-				log.Print(err)
-				return nil
-			}
-			_ = service.SetURLUnparsed(src)
-			return list
-		}
 	}
-	return nil
+	oldHash, err := service.GetURLHash(src)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+	if oldHash != h {
+		_ = service.SetURLUnparsed(src)
+	}
+	tokens <- struct{}{}
+	list, err := exrtactNonDocsWithinOrigin(src, host)
+	<-tokens // release the token
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
+	_ = service.SetURLUnparsed(src)
+	return list
 }
 
 func Crawl() {
