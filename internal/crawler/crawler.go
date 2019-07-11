@@ -64,7 +64,6 @@ func crawl(src, host string, service db.URLWriter) []string {
 		log.Print(err)
 		return nil
 	}
-	_ = service.SetURLUnparsed(src)
 	return list
 }
 

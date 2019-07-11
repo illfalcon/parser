@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/watson-developer-cloud/go-sdk/assistantv2"
+
 	"github.com/illfalcon/parser/internal/db"
 	"github.com/illfalcon/parser/internal/watson"
 	"github.com/illfalcon/parser/pkg/str"
@@ -109,25 +111,40 @@ func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
 	}
 	sel.Each(func(i int, selection *goquery.Selection) {
 		f := func(s string) error {
-			resp, err := watson.Send(s)
-			if err != nil {
-				return err
-			} else {
-				h := str.FindSha1Hash(s)
-				if contains, _ := dbWriter.ContainsHash(h); !contains {
-					var intent string
-					var confidence float64
-					if resp.Output.Intents != nil && len(resp.Output.Intents) != 0 {
-						intent = *resp.Output.Intents[0].Intent
-						confidence = *resp.Output.Intents[0].Confidence
-					} else {
-						intent = "irrelevant"
-						confidence = 0
+			h := str.FindSha1Hash(s)
+			resp := &assistantv2.MessageResponse{Output: &assistantv2.MessageOutput{}}
+			if contains, _ := dbWriter.ContainsHash(h); !contains {
+				if len(s) > 2048 {
+					chch := str.ChunkString(s, 2048)
+					for _, ch := range chch {
+						r, err := watson.Send(ch)
+						if err != nil {
+							return err
+						}
+						resp.Output.Intents = append(resp.Output.Intents, r.Output.Intents...)
 					}
-					err = dbWriter.AddText(s, h, response.Request.URL.String(), intent, confidence)
+				} else {
+					resp, err = watson.Send(s)
 					if err != nil {
 						return err
 					}
+				}
+				var intent string
+				var confidence float64 = -1
+				if resp.Output.Intents != nil && len(resp.Output.Intents) != 0 {
+					for _, i := range resp.Output.Intents {
+						if *i.Confidence > confidence {
+							intent = *i.Intent
+							confidence = *i.Confidence
+						}
+					}
+				} else {
+					intent = "irrelevant"
+					confidence = 0
+				}
+				err = dbWriter.AddText(s, h, response.Request.URL.String(), intent, confidence)
+				if err != nil {
+					return err
 				}
 			}
 			return nil
@@ -136,20 +153,7 @@ func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
 		text = strings.ReplaceAll(text, "\n", " ")
 		text = strings.ReplaceAll(text, "\t", " ")
 		text = strings.ReplaceAll(text, "\r", " ")
-		if len(text) > 2048 {
-			chch := str.ChunkString(text, 2048)
-			for _, ch := range chch {
-				err = f(ch)
-				if err != nil {
-					log.Println(err)
-				}
-			}
-		} else {
-			err = f(text)
-			if err != nil {
-				log.Println(err)
-			}
-		}
+		_ = f(text)
 	})
 	return nil
 }

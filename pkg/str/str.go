@@ -1,6 +1,9 @@
 package str
 
-import "crypto/sha1"
+import (
+	"crypto/sha1"
+	"fmt"
+)
 
 func ChunkString(s string, chunkSize int) []string {
 	var chunks []string
@@ -23,6 +26,6 @@ func ChunkString(s string, chunkSize int) []string {
 func FindSha1Hash(s string) string {
 	h := sha1.New()
 	h.Write([]byte(s))
-	bs := h.Sum(nil)
-	return string(bs)
+	bs := fmt.Sprintf("%x", h.Sum(nil))
+	return bs
 }
