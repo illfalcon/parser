@@ -1,0 +1,26 @@
+{{ define "Index" }}
+  {{ template "Header" }}
+    <h2> Очередь на проверку</h2>
+    <div class="list-group">
+    {{ range . }}
+    <div class="list-group-item flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ .RowID }}</h5>
+      <small>Уверенность: {{ .Probability }}</small>
+    </div>
+    <p class="mb-1" style = "min-height:120px"><small>{{.Article }}</small></p>
+    <div class="row ml-1">
+      <div>
+         <p class="mb-0 float-left" style="vertical-align:bottom">{{.URL}}</p>
+      </div>
+      <div class="ml-auto mr-3">
+         <a class="btn btn-danger" href="/edit?id={{ .RowID }}">Отклонить</a>
+         <a class="btn btn-warning" href="/edit?id={{ .RowID }}">Редактировать</a>
+         <a class="btn btn-success" href="/delete?id={{ .RowID }}">Прниять</a>
+      </div>
+    </div>
+    </div>
+    {{ end }}
+    </div>
+  {{ template "Footer" }}
+{{ end }}

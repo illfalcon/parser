@@ -1,0 +1,40 @@
+{{ define "Landings" }}
+  {{ template "Header" }}
+    <h2> Сайты </h2>
+    <form action="landings/add" method="post" id="add_landing"></form>
+    <table class="table">
+      <thead>
+        <tr>
+          <th style="width: 35%" scope="col">Название</th>
+          <th style="width: 55%" scope="col">Ссылка</th>
+          <th style="width: 10%" scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+    {{ range . }}
+    <tr>
+      <td><a href="#" class = "mb-0 editable editable-click" id="name{{ .RowID }}" data-type="text" data-pk="{{ .RowID }}" data-name="name" data-url="landings/update">{{.Name }}</a></td>
+      <td><a href="#" class = "mb-0 editable editable-click" id="url{{ .RowID }}" data-type="text" data-pk="{{ .RowID }}" data-name="url" data-url="landings/update">{{.URL }}</a></td>
+      <td>
+      <form action="landings/delete" method="post">
+       <input type="hidden" name="id" value="{{ .RowID }}" />
+       <input class="btn btn-danger" type="submit" value="Удалить" />
+      </form>
+    </td>
+    </tr>
+    {{ end }}
+        <tr>
+          <td><input type="text" class="form-control" name="name" form="add_landing" /></td>
+          <td><input type="text" class="form-control" name="url" form="add_landing" /></td>
+          <td><input class="btn btn-success" type="submit" value="Добавить" form="add_landing" /></td>
+        </tr>
+    </tbody>
+    </table>
+    <script>
+    {{ range . }}
+    $('#name{{ .RowID }}').editable();
+    $('#url{{ .RowID }}').editable();
+    {{ end }}
+    </script>
+  {{ template "Footer" }}
+{{ end }}

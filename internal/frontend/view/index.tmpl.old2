@@ -1,0 +1,35 @@
+{{ define "Index" }}
+  {{ template "Header" }}
+    <h2> Очередь </h2>
+    <div class="list-group">
+    {{ range . }}
+    <div class="list-group-item flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ .Id }}</h5>
+      <small>Certainty: 0.76</small>
+    </div>
+
+    <div class="row ml-1">
+      <div>
+         Hello from left
+      </div>
+      <div class="ml-auto mr-3">
+         Hello from right
+      </div>
+    </div>
+
+
+
+    <p class="mb-1" style = "min-height:120px">{{ .Name }}</p>
+    <div class="btn-group row">
+    <p class="mb-1 float-left"><small>{{.City}}</small></p>
+    <div class="float-right row">
+    <a class="btn btn-primary" href="/edit?id={{ .Id }}" role="Edit">Edit</a>
+    <a class="btn btn-primary" href="/delete?id={{ .Id }}" role="Delete">Delete</a>
+    </div>
+    </div>
+    </div>
+    {{ end }}
+    </div>
+  {{ template "Footer" }}
+{{ end }}

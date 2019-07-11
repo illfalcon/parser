@@ -1,0 +1,41 @@
+{{ define "Landings" }}
+  {{ template "Header" }}
+    <h2> Сайты </h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Название</th>
+          <th scope="col">Ссылка</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+    {{ range . }}
+    <tr>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <div class="list-group-item flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ .RowID }}</h5>
+      <small>Certainty: 0.76</small>
+    </div>
+    <a href="#" class = "mb-0 editable editable-click" id="name" data-type="text" data-pk="{{ .RowID }}" data-name="name" data-url="landings/update" data-original-title="Enter name">{{.Name }}</a>
+    <div class="row ml-1">
+      <div>
+         <p class="mb-0 float-left" style="vertical-align:bottom">{{.Hash}}</p>
+      </div>
+      <form action="landings/delete" method="post">
+         <input type="hidden" name="id" value="{{ .RowID }}" />
+         <input class="btn btn-danger" type="submit" value="Удалить" />
+      </form>
+    </div>
+    </div>
+    {{ end }}
+    </div>
+    <script>
+    $('#name').editable();
+    </script>
+  {{ template "Footer" }}
+{{ end }}

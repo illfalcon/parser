@@ -1,0 +1,23 @@
+#container{
+    padding: 0 10px 0 10px;
+}
+#content{
+    max-width: 960px;
+    position: relative;
+    margin: 0 auto;
+}
+.editable-submit::before {
+    content: "✓";
+}
+.editable-cancel::before {
+    content: "✖";
+}
+.fullwidth{
+    width: 100% !important;
+}
+.control-group.form-group{
+    width: 100% !important;
+}
+.control-group.form-group div{
+    width: 100% !important;
+}

@@ -1,0 +1,21 @@
+{{ define "Header" }}
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>Чувство локтя</title>
+        <meta charset="UTF-8" />
+         <link rel="stylesheet" href="/public/lib/bootstrap/css/bootstrap.css">
+         <link rel="stylesheet" href="/public/main.css">
+         <script src="/public/lib/bootstrap/js/bootstrap.js"></script>
+         <script src="/public/lib/jquery/jquery-2.2.4.min.js"></script>
+         <script src="/public/lib/moment.min.js"></script>
+         <script src="/public/lib/bootstrap-editable/bootstrap-editable.min.js"></script>
+         <script>
+         $.fn.editable.defaults.mode = 'inline';
+         </script>
+    </head>
+    <body>
+    {{ template "Menu" }}
+    <div id="container">
+    <div id="content">
+{{ end }}

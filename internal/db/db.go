@@ -7,7 +7,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func dbConn() (db *sql.DB) {
+func Conn() (db *sql.DB) {
 	db, err := sql.Open("sqlite3", "./foo.db")
 	if err != nil {
 		log.Fatal(err)
@@ -16,7 +16,7 @@ func dbConn() (db *sql.DB) {
 }
 
 func Prepare() {
-	db := dbConn()
+	db := Conn()
 	stmt, err := db.Prepare(`CREATE TABLE IF NOT EXISTS landings (
       url TEXT NOT NULL,
       hash TEXT,
@@ -48,7 +48,9 @@ func Prepare() {
       intro TEXT,
       approved INTEGER,
       intent TEXT,
-      probability REAL
+      probability REAL,
+      event_start TEXT,
+      event_end TEXT
     )`)
 	if err != nil {
 		log.Fatal(err)

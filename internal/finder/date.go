@@ -90,6 +90,7 @@ func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	doc.Find("head").Remove()
 	doc.Find("script").Remove()
 	f := func(i int, selection *goquery.Selection) bool {
 		return containsInvitation(selection.Text())

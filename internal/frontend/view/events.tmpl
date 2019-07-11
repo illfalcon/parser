@@ -1,0 +1,72 @@
+{{ define "Events" }}
+  {{ template "Header" }}
+    <h2> События</h2>
+      <div class="ml-auto mr-3">
+         <a class="btn" href="/events?approved=all">Все</a>
+         <a class="btn" href="/events?approved=null"">Очередь</a>
+         <a class="btn" href="/events?approved=yes"">Принятые</a>
+         <a class="btn" href="/events?approved=no"">Отклоненные</a>
+      </div>
+    <div class="list-group">
+    {{ range . }}
+    <div class="list-group-item flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+        <div class="row">
+      <div class="mb-1"><a href="#" style="color:black" class = "mb-1 editable editable-click" id="start{{ .RowID }}" data-type="combodate" data-format="YYYY-MM-DD HH:mm" data-template="YYYY-MM-DD HH:mm" data-pk="{{ .RowID }}" data-name="event_start" data-url="events/update">{{.Start }}</a></div>
+      <div class="mb-1">&nbsp;—&nbsp;</div>
+      <div class="mb-1"><a href="#" style="color:black" class = "mb-1 editable editable-click" id="end{{ .RowID }}" data-type="combodate" data-format="YYYY-MM-DD HH:mm" data-template="YYYY-MM-DD HH:mm" data-pk="{{ .RowID }}" data-name="event_end" data-url="events/update">{{.End }}</a></div>
+       </div>
+      <small>Уверенность: {{ .Probability }}</small>
+    </div>
+    <p class="mb-1" name="article{{ .RowID }}" style = "min-height:120px"><small>
+    <a href="#" style="color:black" class = "mb-0 editable editable-click" id="article{{ .RowID }}" data-type="textarea" data-rows=16 data-pk="{{ .RowID }}" data-name="article" data-url="events/update">{{.Article }}</a>
+    </small></p>
+    <div class="row ml-1">
+      <div>
+         <p class="mb-0 float-left" style="vertical-align:bottom"><a target="_blank" rel="noopener noreferrer" href="#" style="color:black" class = "mb-0 editable editable-click" id="url{{ .RowID }}" data-type="text" data-pk="{{ .RowID }}" data-name="url" data-url="events/update">{{.URL }}</a> <a id="link{{ .RowID }}" class="mb-1" href="#">🔗</a></p>
+      </div>
+      <div class="ml-auto mr-3">
+          <form action="events/update" method="post">
+              <input type="hidden" name="name" value="approval" />
+              <input type="hidden" name="pk" value="{{ .RowID }}" />
+              <button class="btn btn-danger" name="value" value="0">Отклонить</button>
+              <button class="btn btn-success" name="value" value="1">Принять</button>
+          </form>
+      </div>
+    </div>
+    </div>
+    {{ end }}
+    </div>
+       <script>
+       var path = (location.pathname+location.search).substr(1)
+       $("a[href*='"+path+"']").addClass("disabled");
+       {{ range . }}
+       $('#article{{ .RowID }}').editable({inputclass: 'fullwidth'});
+       $('#start{{ .RowID }}').editable();
+       $('#end{{ .RowID }}').editable();
+       $('#url{{ .RowID }}').editable({inputclass: 'fullwidth'});
+       $('#link{{ .RowID }}').on('click', function(){
+              $('<a href='+document.getElementById('url{{ .RowID }}').innerHTML+' target="blank"></a>')[0].click();
+       })
+       {{ end }}
+       var parseQueryString = function() {
+           var str = window.location.search;
+           var objURL = {};
+
+           str.replace(
+               new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
+               function( $0, $1, $2, $3 ){
+                   objURL[ $1 ] = $3;
+               }
+           );
+           return objURL;
+       };
+       var params = parseQueryString();
+       if (params["approved"] == "yes"){
+       $('.btn-success').prop('disabled', true);
+       }else if (params["approved"] == "no"){
+       $('.btn-danger').prop('disabled', true);
+       }
+       </script>
+  {{ template "Footer" }}
+{{ end }}
