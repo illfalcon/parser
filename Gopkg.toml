@@ -48,4 +48,5 @@
 [metadata.heroku]
   root-package = "parser"
   go-version = "1.12.4"
-   install = [ "./cmd" ]
+  install = [ "./..." ]
+  ensure = false
