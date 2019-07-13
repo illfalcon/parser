@@ -1,4 +1,4 @@
-package parser
+package main
 
 import (
 	"github.com/illfalcon/parser/internal/db"
