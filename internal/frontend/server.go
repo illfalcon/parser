@@ -3,6 +3,7 @@ package frontend
 import (
 	"database/sql"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/illfalcon/parser/internal/crawler"
@@ -264,5 +265,13 @@ func Start() {
 	//http.HandleFunc("/update", Update)
 	//http.HandleFunc("/delete", Delete)
 	log.Println("Server started on: http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(getPort(), nil)
+}
+
+func getPort() string {
+	p := os.Getenv("PORT")
+	if p != "" {
+		return ":" + p
+	}
+	return ":8080"
 }
