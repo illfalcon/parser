@@ -46,7 +46,7 @@
   version = "0.9.0"
 
 [metadata.heroku]
-  root-package = "parser"
+  root-package = "github.com/illfalcon/parser"
   go-version = "1.12.4"
-  install = [ "./cmd" ]
+  install = [ "./cmd/..." ]
   ensure = false
