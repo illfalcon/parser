@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/illfalcon/parser/internal/crawler"
+	"github.com/illfalcon/parser/internal/parser"
+
 	"github.com/illfalcon/parser/internal/db"
 
 	"log"
@@ -233,8 +236,16 @@ func ServeFile(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "internal/frontend/"+r.URL.Path[1:])
 }
 
+func Renew(w http.ResponseWriter, r *http.Request) {
+	go func() {
+		log.Println("Started")
+		crawler.Crawl()
+		parser.Parse()
+		log.Println("Finished")
+	}()
+}
+
 func Start() {
-	log.Println("Server started on: http://localhost:8080")
 	http.HandleFunc("/", Index)
 	http.HandleFunc("/events", Events)
 	http.HandleFunc("/events/update", EventsUpdate)
@@ -245,11 +256,13 @@ func Start() {
 	http.HandleFunc("/calendar", Calendar)
 	//http.HandleFunc("/favicon.ico", Favicon)
 	http.HandleFunc("/public/", ServeFile)
+	http.HandleFunc("/renew", Renew)
 	//http.HandleFunc("/show", Show)
 	//http.HandleFunc("/new", New)
 	//http.HandleFunc("/edit", Edit)
 	//http.HandleFunc("/insert", Insert)
 	//http.HandleFunc("/update", Update)
 	//http.HandleFunc("/delete", Delete)
+	log.Println("Server started on: http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }

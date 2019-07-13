@@ -1,4 +1,4 @@
-package finder
+package parser
 
 import (
 	"fmt"
@@ -39,6 +39,14 @@ var months = []string{
 }
 
 var invitations = []string{
+	"встреча", "тренинг", "семинар", "стажировка", "фестиваль", "форум", "конференция", "вебинар", "мастер-класс",
+	"хакатон", "конкурс", "забег", "акселератор", "инкубатор", "концерт", "школа", "супервизия", "презентация", "консультация",
+	"концерт", "аукцион", "организует", "открыт набор", "подать заявку", "зарегистрироваться",
+	"познакомиться", "обменяться опытом", "узнать о", "получить информацию о",
+	"Встреча", "Тренинг", "Семинар", "Стажировка", "Фестиваль", "Форум", "Конференция", "Вебинар", "Мастер-класс",
+	"Хакатон", "Конкурс", "Забег", "Акселератор", "Инкубатор", "Концерт", "Школа", "Супервизия", "Презентация", "Консультация",
+	"Концерт", "Аукцион", "Организует", "Открыт набор", "Подать заявку", "Зарегистрироваться",
+	"Познакомиться", "Обменяться опытом", "Узнать о ", "Получить информацию о ",
 	"Приглашаем", "приглашаем", "Состоится", "состоится", "пройдет", "Пройдет", "пройдёт", "Пройдёт", "открывается",
 	"Открывается", "откроется", "откроется", "проводим", "Проводим", "Проведем", "проведем", "Проведём", "проведём",
 	"приглашаются", "Приглашаются", "проведет", "проведёт", "Проведет", "Проведёт",
@@ -73,12 +81,17 @@ func prepareDoc(htmlText string) string {
 	htmlText = strings.ReplaceAll(htmlText, "</em>", "")
 	htmlText = strings.ReplaceAll(htmlText, "</strong>", "")
 	htmlText = strings.ReplaceAll(htmlText, "</span>", "")
+	htmlText = strings.ReplaceAll(htmlText, "</br>", "")
+	htmlText = strings.ReplaceAll(htmlText, "<br>", "")
+	htmlText = strings.ReplaceAll(htmlText, "<br/>", "")
 	reg := regexp.MustCompile(`<!--[^>]*-->`)
 	htmlText = reg.ReplaceAllString(htmlText, "")
+	space := regexp.MustCompile(`\s+`)
+	htmlText = space.ReplaceAllString(htmlText, " ")
 	return htmlText
 }
 
-func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
+func writeDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
 	htmlBytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return fmt.Errorf("unable to read body")
@@ -151,9 +164,11 @@ func WriteDivsWithDate(response *http.Response, dbWriter db.TextWriter) error {
 			return nil
 		}
 		text := strings.TrimSpace(selection.Closest("div").Contents().Text())
-		text = strings.ReplaceAll(text, "\n", " ")
-		text = strings.ReplaceAll(text, "\t", " ")
-		text = strings.ReplaceAll(text, "\r", " ")
+		//text = strings.ReplaceAll(text, "\n", " ")
+		//text = strings.ReplaceAll(text, "\t", " ")
+		//text = strings.ReplaceAll(text, "\r", " ")
+		space := regexp.MustCompile(`\s+`)
+		text = space.ReplaceAllString(text, " ")
 		_ = f(text)
 	})
 	return nil

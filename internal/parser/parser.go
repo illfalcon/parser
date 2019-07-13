@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/illfalcon/parser/internal/db"
-	"github.com/illfalcon/parser/internal/finder"
 )
 
 func Parse() {
@@ -31,7 +30,7 @@ func Parse() {
 			resp.Body.Close()
 			log.Printf("error when getting url %s, status: %s\n", url, resp.Status)
 		}
-		err = finder.WriteDivsWithDate(resp, &service)
+		err = writeDivsWithDate(resp, &service)
 		if err != nil {
 			log.Print(err)
 		}
