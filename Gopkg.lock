@@ -26,6 +26,30 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:d500496d898be3381278b5b323442f1060d7fead0d2159e126ff6a60da6f8ab0"
+  name = "github.com/antchfx/htmlquery"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "b8d36292614567671decfe6f96c7b8c432d3249b"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:a9f01548dc83b8617f1d74f6ea558c18e67b889915956ebe93b50948dc75e8f5"
+  name = "github.com/antchfx/xmlquery"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8bd964f5eef5a1f086493b5941caae5d3daf76f1"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:3a4202162c0d85f2a5fed5675bd35e6686c8b379c63e40ef105bf3e7d76d97f5"
+  name = "github.com/antchfx/xpath"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ce1d48779e67a1ddfb380995fe532b2e0015919c"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
@@ -53,6 +77,67 @@
   version = "v0.16.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:68cf7fb3705f6dd485634fe42f2b5f52987e5e4086e094f09c89690b0eeaade6"
+  name = "github.com/go-shiori/go-readability"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "b940ed0ce3294bd17d0d8869009cda348eac8fb5"
+
+[[projects]]
+  digest = "1:9ae31ce33b4bab257668963e844d98765b44160be4ee98cafc44637a213e530d"
+  name = "github.com/gobwas/glob"
+  packages = [
+    ".",
+    "compiler",
+    "match",
+    "syntax",
+    "syntax/ast",
+    "syntax/lexer",
+    "util/runes",
+    "util/strings",
+  ]
+  pruneopts = "UT"
+  revision = "5ccd90ef52e1e632236f7326478d4faa74f99438"
+  version = "v0.2.3"
+
+[[projects]]
+  digest = "1:54bdbd4217a4d8b66f06422395bd6370fa20d2bf85149636d3661a1b5053c900"
+  name = "github.com/gocolly/colly"
+  packages = [
+    ".",
+    "debug",
+    "storage",
+  ]
+  pruneopts = "UT"
+  revision = "ca2f07cb3c921eec1b4993f4ff6f00f593dc3af0"
+  version = "v1.2.0"
+
+[[projects]]
+  digest = "1:573ca21d3669500ff845bdebee890eb7fc7f0f50c59f2132f2a0c6b03d85086a"
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  pruneopts = "UT"
+  revision = "6c65a5562fc06764971b7c5d05c76c75e84bdbf7"
+  version = "v1.3.2"
+
+[[projects]]
+  digest = "1:e30ac47ee84d7d354e0a284cf742e3015400667e90aa3d6ae99c7a55da67c645"
+  name = "github.com/kennygrant/sanitize"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "06ec0d0dbcd497d01e5189b16f5263f712e61a8e"
+  version = "v1.2.4"
+
+[[projects]]
+  digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
+
+[[projects]]
   digest = "1:6782ffc812e8e700e6952ede1e60487ff1fd9da489eff762985be662a7cfc431"
   name = "github.com/leodido/go-urn"
   packages = ["."]
@@ -69,6 +154,38 @@
   version = "v1.10.0"
 
 [[projects]]
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:374ce4704830a7b9729d8798bcb4ac796f9c7bbb6903950ec55b71332caffe31"
+  name = "github.com/saintfish/chardet"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3af4cd4741ca4f3eb0c407c034571a6fb0ea529c"
+
+[[projects]]
+  digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "839c75faf7f98a33d445d181f3018b5c3409a45e"
+  version = "v1.4.2"
+
+[[projects]]
+  digest = "1:e2933734cc52e2c304ed132ba5a8320ef21bee5022c67302abb3eeef83d6c515"
+  name = "github.com/temoto/robotstxt"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3f668f68d41cf91350a4148f4fcb6720f1472428"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:15d8f9a39617135be35b5760a5c9249c1d482a8addee933a775a5a0b9bc48e4c"
   name = "github.com/watson-developer-cloud/go-sdk"
   packages = [
@@ -81,14 +198,68 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d7b978a787736537d0ad2f84c0e8b75b05c2febef0537198e28edf1cf2768afd"
+  digest = "1:71a3e45347f39ad3b05480f73358ffbd1f842be417ecc37922776a6173972e0f"
   name = "golang.org/x/net"
   packages = [
+    "context",
     "html",
     "html/atom",
+    "html/charset",
   ]
   pruneopts = "UT"
   revision = "da137c7871d730100384dbcf36e6f8fa493aef5b"
+
+[[projects]]
+  branch = "master"
+  digest = "1:ec99dad7924bf972656818f5d62216fb987b7e077d401deb86b3c1e5e1b1d4d6"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  pruneopts = "UT"
+  revision = "fc99dfbffb4e5ed5758a37e31dd861afe285406b"
+
+[[projects]]
+  digest = "1:8a0baffd5559acaa560f854d7d525c02f4fec2d4f8a214398556fb661a10f6e0"
+  name = "golang.org/x/text"
+  packages = [
+    "encoding",
+    "encoding/charmap",
+    "encoding/htmlindex",
+    "encoding/internal",
+    "encoding/internal/identifier",
+    "encoding/japanese",
+    "encoding/korean",
+    "encoding/simplifiedchinese",
+    "encoding/traditionalchinese",
+    "encoding/unicode",
+    "internal/gen",
+    "internal/language",
+    "internal/language/compact",
+    "internal/tag",
+    "internal/utf8internal",
+    "language",
+    "runes",
+    "transform",
+    "unicode/cldr",
+  ]
+  pruneopts = "UT"
+  revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
+  version = "v0.3.2"
+
+[[projects]]
+  digest = "1:6eb6e3b6d9fffb62958cf7f7d88dbbe1dd6839436b0802e194c590667a40412a"
+  name = "google.golang.org/appengine"
+  packages = [
+    "internal",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch",
+  ]
+  pruneopts = "UT"
+  revision = "b2f4a3cf3c67576a2ee09e1fe62656a5086ce880"
+  version = "v1.6.1"
 
 [[projects]]
   digest = "1:ee2db1a4b9111947da887ff2f8972dd2cc80906e521a2d856901fa699b4b51ee"
@@ -104,7 +275,10 @@
   input-imports = [
     "github.com/IBM/go-sdk-core/core",
     "github.com/PuerkitoBio/goquery",
+    "github.com/go-shiori/go-readability",
+    "github.com/gocolly/colly",
     "github.com/mattn/go-sqlite3",
+    "github.com/pkg/errors",
     "github.com/watson-developer-cloud/go-sdk/assistantv2",
     "golang.org/x/net/html",
   ]

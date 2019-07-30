@@ -50,3 +50,15 @@
   go-version = "1.12.4"
   install = [ "." ]
   ensure = false
+
+[[constraint]]
+  name = "github.com/gocolly/colly"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/pkg/errors"
+  version = "0.8.1"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/go-shiori/go-readability"
